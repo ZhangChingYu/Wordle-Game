@@ -3,6 +3,7 @@ Project Description...
 
 
 ## Project Directory
+```t
 wordle-game/
 ├── pages/          # Web page contents
 │   ├── page.tsx    # Homepage
@@ -11,3 +12,4 @@ wordle-game/
 ├── public/         # Static resources (images, favicon)
 ├── styles/         # styles (CSS、Tailwind)
 ├── package.json    # dependencies and scripts
+```
