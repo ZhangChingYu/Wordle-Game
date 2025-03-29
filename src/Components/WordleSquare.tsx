@@ -1,6 +1,7 @@
+'use client';
 interface SquareProps {
     status?:string,
-    value?:string
+    value?:string,
 }
 
 export default function WordleSquare( {status='', value=''}:SquareProps ) {

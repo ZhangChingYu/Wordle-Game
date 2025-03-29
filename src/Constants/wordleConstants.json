@@ -34,5 +34,13 @@
             "M",
             "DELETE"
         ]
+    ],
+    "inputs": [
+        [{"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}], 
+        [{"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}], 
+        [{"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}], 
+        [{"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}], 
+        [{"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}], 
+        [{"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}, {"value":"", "status":""}]
     ]
 }
