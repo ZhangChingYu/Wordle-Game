@@ -4,6 +4,12 @@
   --background: #ffffff;
   --foreground: #171717;
   cursor: default;
+
+  user-select: none;   
+  -webkit-user-select: none;  /* Safari/Chrome */
+  -webkit-touch-callout: none;
+  -moz-user-select: none;     /* Firefox */
+  -ms-user-select: none; 
 }
 
 @theme inline {
