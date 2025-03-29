@@ -1,13 +1,17 @@
 import "./globals.css";
-import { Wordle as WordleBoard } from "@/Pages";
+// import { Wordle } from "@/pages";
 
-export default function RootLayout() {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <title>Wordle Here We Go!</title>
-      <body>
-        <WordleBoard/>
-      </body>
+      <head>
+        <title>Wordle Here We Go!</title>
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

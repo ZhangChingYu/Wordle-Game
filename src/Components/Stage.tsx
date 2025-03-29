@@ -1,11 +1,11 @@
+import Image from "next/image";
 interface StageProps {
     image: string, 
     alt?: string    // optional attribute
 }
 
-
 export default function Stage({ image, alt="Stage" } : StageProps) {
     return (
-        <img src={image} alt={alt} className="mx-[8pt] w-[4rem]"/>
+        <Image src={image} alt={alt} width={60} height={60} className="mx-[8pt]"/>
     );
 }

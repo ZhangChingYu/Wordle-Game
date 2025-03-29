@@ -21,5 +21,5 @@ export default function WordleSquare( {status='', value=''}:SquareProps ) {
         <div className={`w-[5rem] h-[4rem] mx-[4pt] flex justify-center items-center rounded-md ${getBgStyle()}`}>
             <p className="text-white text-[30px] font-bold">{value}</p>
         </div>
-    )
+    );
 }
