@@ -9,6 +9,7 @@ export function useWordle() {
     const [curRow, setCurRow] = useState(0);
     const [curCol, setCurCol] = useState(0);
     const [gameOver, setGameOver] = useState<boolean>(false);
+    const [keyboard, setKeyboard] = useState<{value:string, status:string}[][]>([]);
 
     // fetch answer word
     useEffect(() => {
@@ -18,6 +19,11 @@ export function useWordle() {
     // fetch valid word list
     useEffect(() => {
         fetchValidWordList().then(setValidWords);
+    }, []);
+
+    // load key items
+    useEffect(() => {
+        setKeyboard(constants.keyboards);
     }, []);
 
     // keydown event listener
@@ -34,7 +40,7 @@ export function useWordle() {
         };
         window.addEventListener('keydown', keyDownEvent);
         return () => window.removeEventListener('keydown', keyDownEvent);
-    }, [inputs, curRow, curCol, gameOver]);
+    }, [inputs, keyboard, curRow, curCol, gameOver]);
 
     const keyHandler = function (value: string) {
         if(gameOver) {
@@ -85,12 +91,14 @@ export function useWordle() {
     const wordMatchHandler = () => {
         let target = word;
         let matchCount = 0;
+        let tempKeyboard = keyboard;
         const tempInputs = inputs;
         // deep copy
         const tempRow = JSON.parse(JSON.stringify(inputs[curRow]));
         // check correct
         for (let i = 0; i < tempRow.length; i++) {
             if (tempRow[i].value === target[i]) {
+                tempKeyboard = setKeyStatus(tempKeyboard, tempInputs[curRow][i].value, "correct");
                 target = target.replace(tempRow[i].value, "_");
                 tempRow[i].value = "+";
                 tempInputs[curRow][i].status = "correct";
@@ -100,13 +108,20 @@ export function useWordle() {
         // check exists
         for (let i = 0; i < 5; i++) {
             if (target.includes(tempRow[i].value)) {
+                tempKeyboard = setKeyStatus(tempKeyboard, tempInputs[curRow][i].value, "exist");
                 target = target.replace(tempRow[i].value, "_");
                 tempRow[i].value = "+";
                 tempInputs[curRow][i].status = "exist";
+            } else {
+                if(tempInputs[curRow][i].status==="") {
+                    tempKeyboard = setKeyStatus(tempKeyboard, tempInputs[curRow][i].value, "incorrect");
+                    tempInputs[curRow][i].status ="incorrect";
+                }
             }
         }
         target = word;
         setInputs(tempInputs);
+        setKeyboard(tempKeyboard);
         if(matchCount === 5) {
             setGameOver(true);
             alert("You Win!");
@@ -118,8 +133,29 @@ export function useWordle() {
             setCurCol(0);
             setCurRow(curRow + 1);
         }
+
+        function setKeyStatus(keyboard:{value:string, status:string}[][], letter:string, status: string){
+            console.log(word);
+            const newKeyboard = keyboard;
+            for(let row = 0 ; row < newKeyboard?.length ; row ++) {
+                for(let col = 0 ; col < newKeyboard[row].length ; col ++) {
+                    if(newKeyboard[row][col].value === letter){
+                        console.log("get key: ", newKeyboard[row][col].value, letter, status);
+                        if(status === "correct"){
+                            newKeyboard[row][col].status = status;
+                        } else if (status === "exist"){
+                            newKeyboard[row][col].status = newKeyboard[row][col].status != "correct" ? status:"correct";
+                        } else if(newKeyboard[row][col].status === "") {
+                            newKeyboard[row][col].status = status;
+                        }
+                        console.log(newKeyboard[row][col].status);
+                    }
+                }
+            }
+            return newKeyboard;
+        }
     }
 
-    return { inputs, keyHandler };
+    return { inputs, keyboard, keyHandler };
 }
 

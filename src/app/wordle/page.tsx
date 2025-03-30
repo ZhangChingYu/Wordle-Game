@@ -1,10 +1,9 @@
 'use client';
 import { StageIcon, WordleSquare, KeyBtn } from "@/Components";
-import constants from '@/Constants/wordleConstants.json';
 import { useWordle } from './useWordle';
 
 export default function Wordle() {
-    const { inputs, keyHandler } = useWordle();
+    const { inputs, keyboard, keyHandler } = useWordle();
 
     return (
         <div className="bg-slate-800 h-screen w-full fixed flex justify-center items-center overflow-scroll">
@@ -35,14 +34,13 @@ export default function Wordle() {
                     </div>
                 </div>
                 <div className="w-full flex flex-col mb-[1rem]">
-                    {constants.keyboards.map((row, rowIndex) => (
+                    {keyboard.map((row, rowIndex) => (
                         <div key={rowIndex} className="flex flex-row justify-center items-center">
-                            {row.map((value, index) => (
-                                <KeyBtn key={index} value={value} clickHandler={keyHandler} />
+                            {row.map((keyItem, index) => (
+                                <KeyBtn key={index} value={keyItem.value} status={keyItem.status} clickHandler={keyHandler} />
                             ))}
                         </div>
                     ))}
-
                 </div>
             </div>
         </div>
