@@ -1,98 +1,10 @@
 'use client';
 import { StageIcon, WordleSquare, KeyBtn } from "@/Components";
 import constants from '@/Constants/wordleConstants.json';
-import { useState, useEffect } from "react";
+import { useWordle } from './useWordle';
 
 export default function Wordle() {
-    const [word, setWord] = useState("TASTE");
-    const [inputs, setInputs] = useState(constants.inputs);
-    const [curRow, setCurRow] = useState(0);
-    const [curCol, setCurCol] = useState(0);
-
-    useEffect(() => {
-        fetch('/answers.json')
-            .then((res) => res.json())
-            .then((data) => {
-                const wordList = data.words;
-                const randomWord = wordList[Math.floor(Math.random() * wordList.length)];
-                setWord(randomWord.toUpperCase());
-                console.log("Answer: ",randomWord.toUpperCase());
-            })
-            .catch((error) => console.error("Error loading words:", error));
-    }, []);
-
-    useEffect(() => {
-        const keyDownEvent = (e: KeyboardEvent) => {
-            const isLetter = /^[a-zA-Z]$/.test(e.key);
-            if (e.key === "Enter") {
-                keyHandler("ENTER");
-            }
-            else if (e.key === "Backspace") {
-                keyHandler("DELETE");
-            }
-            else if (isLetter) {
-                keyHandler(e.key.toUpperCase());
-            }
-        }
-        window.addEventListener('keydown', keyDownEvent);
-        return () => window.removeEventListener('keydown', keyDownEvent);
-    }, [curRow, curCol]);
-
-    const checkSpellHandler = () => {
-        if (curCol <= 4) {
-            alert("Not enough letters!");
-        }
-        else if (curCol === 5) {
-            let target = word;
-            const tempInputs = inputs;
-            // deep copy
-            const tempRow = JSON.parse(JSON.stringify(inputs[curRow]));
-            // check correct
-            for (let i = 0; i < tempRow.length; i++) {
-                if (tempRow[i].value === target[i]) {
-                    target = target.replace(tempRow[i].value, "_");
-                    tempRow[i].value = "+";
-                    tempInputs[curRow][i].status = "correct";
-                }
-            }
-            // check exists
-            for (let i = 0; i < 5; i++) {
-                if (target.includes(tempRow[i].value)) {
-                    target = target.replace(tempRow[i].value, "_");
-                    tempRow[i].value = "+";
-                    tempInputs[curRow][i].status = "exist";
-                }
-            }
-            target = word;
-            setInputs(tempInputs);
-            setCurCol(0);
-            if (curRow < 5) {
-                setCurRow(curRow + 1);
-            }
-        }
-
-    }
-
-    const keyHandler = function (value: string) {
-        if (value === 'ENTER') {
-            checkSpellHandler();
-        } else if (value === 'DELETE') {
-            const tempInputs = constants.inputs;
-            if (curCol > 0) {
-                tempInputs[curRow][curCol - 1].value = "";
-                setInputs(tempInputs);
-                setCurCol(curCol - 1);
-            }
-
-        } else {
-            if (curRow < 6 && curCol < 5) {
-                const tempInputs = constants.inputs;
-                tempInputs[curRow][curCol].value = value;
-                setInputs(tempInputs);
-                setCurCol(curCol + 1);
-            }
-        }
-    }
+    const { inputs, keyHandler } = useWordle();
 
     return (
         <div className="bg-slate-800 h-screen w-full fixed flex justify-center items-center overflow-scroll">
