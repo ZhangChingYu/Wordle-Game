@@ -1,15 +1,16 @@
 'use client';
-import { StageIcon, WordleSquare, KeyBtn } from "@/Components";
+import { StageIcon, WordleBoard, KeyBtn, AlertDropdown, PauseMask } from "@/Components";
 import { useWordle } from './useWordle';
 
 export default function Wordle() {
-    const { inputs, keyboard, keyHandler } = useWordle();
+    const { inputs, keyboard, message, dropdown, score, gameOver, keyHandler, setDropdown, nextLevel } = useWordle();
 
     return (
-        <div className="bg-slate-800 h-screen w-full fixed flex justify-center items-center overflow-scroll">
+        <div className="bg-slate-800 h-screen w-full fixed flex justify-center items-center">
+            <AlertDropdown show={dropdown} message={message} clickHandler={setDropdown} />
             <div className="bg-slate-900 h-auto w-auto px-1 flex flex-col">
                 <div className="w-full pt-[.5rem] flex justify-center items-center">
-                    <p className="text-[30px] font-bold text-white tracking-widest">0000</p>
+                    <p className="text-[30px] font-bold text-green-500 tracking-widest">{score}</p>
                 </div>
                 <div className="flex flex-row justify-center items-center py-[.5rem]">
                     <StageIcon image="/StageHighlightIcon.png" />
@@ -18,21 +19,7 @@ export default function Wordle() {
                     <StageIcon image="/StageIcon.png" />
                     <StageIcon image="/StageIcon.png" />
                 </div>
-                <div className="w-full py-[1rem]">
-                    <div className="w-full h-auto flex flex-col justify-center">
-                        {inputs.map((row, rowIndex) => (
-                            <div key={rowIndex} className="flex flex-row justify-center items-center pt-[.5rem]">
-                                {row.map((item, colIndex) => (
-                                    <WordleSquare
-                                        key={colIndex}
-                                        value={item.value}
-                                        status={item.status} />
-                                ))}
-                            </div>
-                        ))}
-
-                    </div>
-                </div>
+                <WordleBoard inputs={inputs} />
                 <div className="w-full flex flex-col mb-[1rem]">
                     {keyboard.map((row, rowIndex) => (
                         <div key={rowIndex} className="flex flex-row justify-center items-center">
@@ -43,6 +30,7 @@ export default function Wordle() {
                     ))}
                 </div>
             </div>
+            <PauseMask puase={gameOver} nextGame={nextLevel}/>
         </div>
     );
 }

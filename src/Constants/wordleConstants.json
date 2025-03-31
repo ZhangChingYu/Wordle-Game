@@ -36,11 +36,11 @@
         ]
     ],
    "inputs": [
-        [{ "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":""}], 
-        [{ "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":""}], 
-        [{ "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":""}], 
-        [{ "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":""}], 
-        [{ "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":""}], 
-        [{ "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":"" }, { "value":"","status":""}]
+        [{ "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":""}], 
+        [{ "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":""}], 
+        [{ "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":""}], 
+        [{ "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":""}], 
+        [{ "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":""}], 
+        [{ "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":"", "animation":""  }, { "value":"","status":""}]
     ]
 }

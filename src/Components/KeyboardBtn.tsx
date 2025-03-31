@@ -25,9 +25,9 @@ export default function KeyBtn({value, status='', clickHandler}:KeyboardProps) {
                 sethoverColor('bg-slate-700');
                 break;
             case 'incorrect':
-                setBgColor('bg-slate-600');
-                setIdleColor('bg-slate-600');
-                sethoverColor('bg-slate-700');
+                setBgColor('bg-slate-500 opacity-50');
+                setIdleColor('bg-slate-500 opacity-50');
+                sethoverColor('bg-slate-700 opacity-50');
                 break;
             case 'exist':
                 setBgColor('bg-amber-400');

@@ -1,6 +1,9 @@
 # Worldle Game (Next.js + Typescript + Tailwindcss)
 Project Description...
 
+## Game Rules
+- Guess the word: 1000
+- Chances left: 100 per chance
 
 ## Project Directory
 ```t

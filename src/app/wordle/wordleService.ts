@@ -3,7 +3,9 @@ export const fetchRandomWord = async():Promise<string> => {
         const res = await fetch("/answers.json");
         const data = await res.json();
         const wordList = data.words;
-        return wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
+        const word = wordList[Math.floor(Math.random() * wordList.length)].toUpperCase();
+        console.log(word);
+        return word;
     } catch (error){
         console.error("Error loading answers.json", error);
         return "ERROR";
