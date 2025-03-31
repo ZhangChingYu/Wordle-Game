@@ -8,13 +8,13 @@ interface WordleProps {
         value: string;
         status: string;
         animation?: undefined;
-    })[][]
+    })[][],
 }
 
 export default function WordleBoard({inputs}:WordleProps) {
     return (
-        <div className="w-full py-[1rem]">
-            <div className="w-full h-auto flex flex-col justify-center">
+        <div className="w-auto py-[1rem] px-[2rem]">
+            <div className="w-auto h-auto flex flex-col justify-center">
                 {inputs.map((row, rowIndex) => (
                     <div key={rowIndex} className="flex flex-row justify-center items-center pt-[.5rem]">
                         {row.map((item, colIndex) => (

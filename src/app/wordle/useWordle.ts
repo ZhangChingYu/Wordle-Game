@@ -5,7 +5,22 @@ import constants from "@/Constants/wordleConstants.json";
 export function useWordle() {
     const [word, setWord] = useState("TASTE");
     const [validWords, setValidWords] = useState<string[]>([]);
-    const [inputs, setInputs] = useState(constants.inputs);
+    const [inputs, setInputs] = useState<({
+        value: string;
+        status: string;
+        animation: string;
+    } | {
+        value: string;
+        status: string;
+        animation?: undefined;
+    })[][]>([]);
+    const [levels, setLevels] = useState([
+        JSON.parse(JSON.stringify(constants.inputs)),
+        JSON.parse(JSON.stringify(constants.inputs)),
+        JSON.parse(JSON.stringify(constants.inputs)),
+        JSON.parse(JSON.stringify(constants.inputs)),
+        JSON.parse(JSON.stringify(constants.inputs))
+    ]);
     const [curRow, setCurRow] = useState(0);
     const [curCol, setCurCol] = useState(0);
     const [enterPressed, setEnterPressed] = useState(false);
@@ -15,25 +30,36 @@ export function useWordle() {
     const [dropdown, setDropdown] = useState<boolean>(false);
 
     const [gameOver, setGameOver] = useState<boolean>(false);
-    const [score, setScore] = useState<string>('0000');
-    const [level, setLevel] = useState(1);
+    const [gamePuase, setGamePause] = useState<boolean>(false);
+    const [score, setScore] = useState<number>(0);
+    const [curLevel, setCurLevel] = useState(0);
 
-    // initialize game data
+    // load initial data
+    useEffect(() => {
+        if(gameOver) {
+            setLevels([]);
+        }
+        fetchValidWordList().then(setValidWords);   // fetch valid word list
+        setInputs(levels[0]);
+        setCurLevel(0);
+    }, [gameOver])
+
+    // reset game data
     useEffect(() => {
         init();
-    }, [level]);
+    }, [curLevel]);
 
     const init = () => {
         resetGame();
-        fetchRandomWord().then(setWord);                    // fetch answer word
-        fetchValidWordList().then(setValidWords);           // fetch valid word list
-        setKeyboard(JSON.parse(JSON.stringify(constants.keyboards)));                   // load key items
-        setInputs(JSON.parse(JSON.stringify(constants.inputs)));                        // load inputs
+        fetchRandomWord().then(setWord);                                // fetch answer word
+        setKeyboard(JSON.parse(JSON.stringify(constants.keyboards)));   // load key items
+        setInputs(levels[curLevel]);
+        console.log(inputs);
     }
 
     // reset game state
     const resetGame = () => {
-        setGameOver(false);
+        setGamePause(false);
         setMessage("");
         setCurCol(0);
         setCurRow(0);
@@ -42,8 +68,11 @@ export function useWordle() {
 
     // next game
     const nextLevel = () => {
-        console.log("next level");
-        setLevel(prevLevel => prevLevel + 1);
+        if(curLevel < 4) {
+            setCurLevel(prevLevel => prevLevel + 1);
+        } else {
+            alert("You Win Game Over");
+        }
     };
 
     // keydown event listener
@@ -56,14 +85,17 @@ export function useWordle() {
                 keyHandler("DELETE");
             } else if (isLetter) {
                 keyHandler(e.key.toUpperCase());
+            } else if(e.key === " ") {
+                setMessage(word);
+                setDropdown(true);
             }
         };
         window.addEventListener('keydown', keyDownEvent);
         return () => window.removeEventListener('keydown', keyDownEvent);
-    }, [inputs, keyboard, curRow, curCol, gameOver, score, enterPressed, dropdown]);
+    }, [inputs, keyboard, curRow, curCol, gamePuase, score, enterPressed, dropdown]);
 
     const keyHandler = function (value: string) {
-        if (gameOver) {
+        if (gamePuase) {
             return;
         }
         if (value === 'ENTER') {
@@ -171,16 +203,17 @@ export function useWordle() {
     }
 
     const handleWin = async () => {
-        setGameOver(true);
+        setGamePause(true);
 
-        let tempScore = 1000;
+        let tempScore = score;
+        tempScore += 1000;
         // 1000 point for guessing the answer
-        setScore(`${tempScore}`);
+        setScore(tempScore);
         // 100 point for each row left
         for (let i = curRow; i < 5; i++) {
             await delay(500);
             tempScore += 100;
-            setScore(`${tempScore}`);
+            setScore(tempScore);
         }
         delay(100);
         setMessage("You Win!");
@@ -232,7 +265,7 @@ export function useWordle() {
         }
     };
 
-    return { inputs, keyboard, message, dropdown, score, gameOver, keyHandler, setDropdown, nextLevel };
+    return { inputs, curLevel, levels, keyboard, message, dropdown, score, gamePuase, keyHandler, setDropdown, nextLevel };
 }
 
 
