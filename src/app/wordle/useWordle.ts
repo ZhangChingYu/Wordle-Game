@@ -54,12 +54,10 @@ export function useWordle() {
         fetchRandomWord().then(setWord);                                // fetch answer word
         setKeyboard(JSON.parse(JSON.stringify(constants.keyboards)));   // load key items
         setInputs(levels[curLevel]);
-        console.log(inputs);
     }
 
     // reset game state
     const resetGame = () => {
-        setGamePause(false);
         setMessage("");
         setCurCol(0);
         setCurRow(0);
@@ -69,6 +67,7 @@ export function useWordle() {
     // next game
     const nextLevel = () => {
         if(curLevel < 4) {
+            setGamePause(false);
             setCurLevel(prevLevel => prevLevel + 1);
         } else {
             alert("You Win Game Over");

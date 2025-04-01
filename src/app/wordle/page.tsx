@@ -1,5 +1,5 @@
 'use client';
-import { StageIcon, WordleBoard, KeyBtn, AlertDropdown, PauseMask } from "@/Components";
+import { StageIcon, WordleBoard, KeyBtn, AlertDropdown, PauseMask, Arrow } from "@/Components";
 import { useWordle } from './useWordle';
 
 export default function Wordle() {
@@ -10,12 +10,16 @@ export default function Wordle() {
             <AlertDropdown show={dropdown} message={message} clickHandler={setDropdown} />
             <div className="bg-slate-900 h-auto w-auto px-1 flex flex-col items-center">
                 <div className="w-full pt-[.5rem] flex justify-center items-center">
-                    <p className="text-[30px] font-bold text-green-500 tracking-widest">{`${score}`}</p>
+                    <p className="text-[30px] font-bold text-green-500 tracking-widest">{`${score===0?"0000":score}`}</p>
                 </div>
                 <div className="flex flex-row justify-center items-center py-[.5rem]">
-                    {[...Array(5)].map((_, id)=>(
-                        <StageIcon key={id} image={id===curLevel?"/StageHighlightIcon.png":"/StageIcon.png"} />
+                    {[...Array(4)].map((_, id)=>(
+                        <div key={id} className="flex flex-row items-center">
+                            <StageIcon image={id===curLevel?"/StageHighlightIcon.png":"/StageIcon.png"} />
+                            <Arrow show={gamePuase&&id===curLevel} />
+                        </div>
                     ))}
+                    <StageIcon image={4===curLevel?"/StageHighlightIcon.png":"/StageIcon.png"} />
                 </div>
                 <div className="w-[33rem] flex items-center overflow-x-hidden">
                     <div className="w-auto flex flex-row items-center 
