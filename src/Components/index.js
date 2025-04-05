@@ -4,4 +4,8 @@ export { default as WordleBoard } from './WordleBoard';
 export { default as KeyBtn } from './KeyboardBtn';
 export { default as AlertDropdown } from './AlertDropdown';
 export { default as PauseMask } from './PauseMask';
+export { default as GameComplete } from './GameOver';
 export { default as Arrow } from './Arrow';
+export { default as Bar } from './Bar';
+export { default as Button } from './Button';
+export { default as Setting } from './Setting'; 

@@ -2,17 +2,18 @@ import { useEffect } from "react"
 
 interface MaskProps {
     puase:boolean,
+    delay:number,
     nextGame:()=>void
 }
 
-export default function PauseMask({puase, nextGame}:MaskProps) {
+export default function PauseMask({puase, delay, nextGame}:MaskProps) {
     useEffect(() => {
         setTimeout(() => {
             if(puase) {
                 nextGame();
                 console.log("next game go")
             }
-        }, 2200);
+        }, delay);
     }, [puase])
     return (
         <div className="">

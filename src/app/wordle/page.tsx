@@ -1,9 +1,11 @@
 'use client';
-import { StageIcon, WordleBoard, KeyBtn, AlertDropdown, PauseMask, Arrow } from "@/Components";
+import { StageIcon, WordleBoard, KeyBtn, AlertDropdown, PauseMask, GameComplete, Arrow } from "@/Components";
 import { useWordle } from './useWordle';
 
 export default function Wordle() {
-    const { curLevel, levels, keyboard, message, dropdown, score, gamePuase, keyHandler, setDropdown, nextLevel } = useWordle();
+    const { curLevel, levels, keyboard, message, dropdown, score, 
+        pauseDelay, gamePuase, gameComplete, gameOver, guessCount, 
+        keyHandler, setDropdown, nextLevel, newGame } = useWordle();
 
     return (
         <div className="bg-slate-800 h-screen w-full fixed flex justify-center items-center">
@@ -40,7 +42,25 @@ export default function Wordle() {
                     ))}
                 </div>
             </div>
-            <PauseMask puase={gamePuase} nextGame={nextLevel} />
+            <PauseMask puase={gamePuase} delay={pauseDelay} nextGame={nextLevel} />
+            <GameComplete 
+                show={gameComplete} 
+                title="CONGRATULATIONS!" 
+                curLevel={5}
+                guessCount={guessCount}
+                startNewGame={newGame} 
+                score={score} message="WELL PLAYED, DO YOU WANT TO TRY AGAIN OR EXPLORE OTHER GAMES?"/>
+            <GameComplete 
+                show={gameOver} 
+                title="You Loss!" 
+                score={score}
+                guessCount={guessCount}
+                curLevel={curLevel}
+                startNewGame={newGame} 
+                message="WANNA TRY AGAIN? OR TO TRY OTHER GAMES MAYBE?"/>
+            {
+                //<Setting />
+            }
         </div>
     );
 }

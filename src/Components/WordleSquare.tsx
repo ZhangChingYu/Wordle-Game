@@ -18,6 +18,8 @@ export default function WordleSquare( {status='', value='', flipDelay='0', anima
                 return 'bg-amber-400';
             case 'correct':
                 return 'bg-green-500';
+            case 'clear':
+                return 'bg-green-500 border-2 border-slate-500';
         }
     }
     
@@ -25,11 +27,15 @@ export default function WordleSquare( {status='', value='', flipDelay='0', anima
     const getAnimation = () => {
         switch(animation) {
             case '':
-                return 'border-2 border-slate-500';
+                return 'border-2 border-slate-500'
             case 'flip':
                 return 'rotate-x-180 '+getBgStyle();
             case 'error':
-                return 'border-2 border-slate-500 animate-shake'
+                return 'border-2 border-slate-500 animate-shake';
+            case 'win':
+                return 'border-2 border-white ' + getBgStyle();
+            case 'open':
+                return 'rotate-x-180 '+getBgStyle();
             default:
                 return 'border-2 border-slate-500';
         }

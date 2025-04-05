@@ -1,25 +1,24 @@
 import { useEffect, useState } from "react";
 import { fetchRandomWord, fetchValidWordList } from "./wordleService";
 import constants from "@/Constants/wordleConstants.json";
+import WORDLE_CONSTANTS from "@/Constants/wordleContants";
+
+interface InputData {
+    value: string,
+    status: string,
+    animation: string
+}
 
 export function useWordle() {
     const [word, setWord] = useState("TASTE");
     const [validWords, setValidWords] = useState<string[]>([]);
-    const [inputs, setInputs] = useState<({
-        value: string;
-        status: string;
-        animation: string;
-    } | {
-        value: string;
-        status: string;
-        animation?: undefined;
-    })[][]>([]);
-    const [levels, setLevels] = useState([
-        JSON.parse(JSON.stringify(constants.inputs)),
-        JSON.parse(JSON.stringify(constants.inputs)),
-        JSON.parse(JSON.stringify(constants.inputs)),
-        JSON.parse(JSON.stringify(constants.inputs)),
-        JSON.parse(JSON.stringify(constants.inputs))
+    const jsonStr = JSON.stringify(constants.inputs);
+    const [levels, setLevels] = useState<InputData[][][]>([
+        JSON.parse(jsonStr),
+        JSON.parse(jsonStr),
+        JSON.parse(jsonStr),
+        JSON.parse(jsonStr),
+        JSON.parse(jsonStr)
     ]);
     const [curRow, setCurRow] = useState(0);
     const [curCol, setCurCol] = useState(0);
@@ -30,49 +29,72 @@ export function useWordle() {
     const [dropdown, setDropdown] = useState<boolean>(false);
 
     const [gameOver, setGameOver] = useState<boolean>(false);
+    const [gameComplete, setGameComplete] = useState<boolean>(false);
     const [gamePuase, setGamePause] = useState<boolean>(false);
-    const [score, setScore] = useState<number>(0);
-    const [curLevel, setCurLevel] = useState(0);
 
-    // load initial data
+    const [score, setScore] = useState<number>(0);
+    const [guessCount, setGuessCount] = useState<number>(0);
+    const [curLevel, setCurLevel] = useState<number>(0);
+    const [pauseDelay, setPauseDelay] = useState<number>(5800);
+    
+
+    // setup initial data when page load
     useEffect(() => {
-        if(gameOver) {
-            setLevels([]);
-        }
-        fetchValidWordList().then(setValidWords);   // fetch valid word list
-        setInputs(levels[0]);
-        setCurLevel(0);
-    }, [gameOver])
+        newGame();
+    }, []);
 
     // reset game data
     useEffect(() => {
-        init();
-    }, [curLevel]);
+        // only execute when on level changes but don't repeat this when window reload
+        if (!gameComplete && !gameOver && curLevel != 0) {
+            init();
+        }
+    }, [curLevel, gameComplete, gameOver]);
 
     const init = () => {
         resetGame();
         fetchRandomWord().then(setWord);                                // fetch answer word
         setKeyboard(JSON.parse(JSON.stringify(constants.keyboards)));   // load key items
-        setInputs(levels[curLevel]);
     }
 
     // reset game state
     const resetGame = () => {
         setMessage("");
+        setDropdown(false);
         setCurCol(0);
         setCurRow(0);
-        setDropdown(false);
     }
 
-    // next game
+    // next level
     const nextLevel = () => {
-        if(curLevel < 4) {
+        if (curLevel < WORDLE_CONSTANTS.MAX_LEVEL - 1) {
             setGamePause(false);
             setCurLevel(prevLevel => prevLevel + 1);
         } else {
-            alert("You Win Game Over");
+            setGameComplete(true);
         }
     };
+
+    // new game
+    const newGame = () => {
+        setLevels([
+            JSON.parse(jsonStr),
+            JSON.parse(jsonStr),
+            JSON.parse(jsonStr),
+            JSON.parse(jsonStr),
+            JSON.parse(jsonStr)
+        ]);
+        fetchValidWordList().then(setValidWords);   // fetch valid word list
+        setScore(0);
+        setCurLevel(0);
+        setGuessCount(0);
+        init();
+        setGameComplete(false);
+        setGameOver(false);
+        setGamePause(false);
+    }
+
+    useEffect(() => {}, [levels]);
 
     // keydown event listener
     useEffect(() => {
@@ -84,14 +106,16 @@ export function useWordle() {
                 keyHandler("DELETE");
             } else if (isLetter) {
                 keyHandler(e.key.toUpperCase());
-            } else if(e.key === " ") {
+            } else if (e.key === " ") {
                 setMessage(word);
                 setDropdown(true);
+            } else if (e.key === "-") {
+                setGameComplete(true);
             }
         };
         window.addEventListener('keydown', keyDownEvent);
         return () => window.removeEventListener('keydown', keyDownEvent);
-    }, [inputs, keyboard, curRow, curCol, gamePuase, score, enterPressed, dropdown]);
+    }, [keyboard, curRow, curCol, gamePuase, score, enterPressed, dropdown]);
 
     const keyHandler = function (value: string) {
         if (gamePuase) {
@@ -108,15 +132,16 @@ export function useWordle() {
     }
 
     const checkSpellHandler = () => {
-        if (curCol <= 4) {
+        if (curCol < WORDLE_CONSTANTS.MAX_COL) {
             shakeAnimationTrigger();
             setMessage("Too Short!");
             setDropdown(true);
         }
         else {
             // concat 5 letters
-            const inputWord = inputs[curRow].map((cell) => cell.value).join("");
+            const inputWord = levels[curLevel][curRow].map((cell) => cell.value).join("");
             if (checkValidHandler(inputWord)) {
+                setGuessCount((pre) => pre + 1);
                 processWordMatch();
             } else {
                 shakeAnimationTrigger();
@@ -138,44 +163,45 @@ export function useWordle() {
     const processWordMatch = async () => {
         let target = word;
         let matchCount = 0;
-        const tempInputs = [...inputs];
+        const tempLevels = [...levels];
         let tempKeyboard = [...keyboard];
         // deep copy
-        const tempRow = JSON.parse(JSON.stringify(inputs[curRow]));
+        const tempRow = JSON.parse(JSON.stringify(levels[curLevel][curRow]));
         // check correct
         for (let i = 0; i < tempRow.length; i++) {
             if (tempRow[i].value === target[i]) {
-                tempKeyboard = setKeyStatus(tempKeyboard, tempInputs[curRow][i].value, "correct");
+                tempKeyboard = setKeyStatus(tempKeyboard, tempLevels[curLevel][curRow][i].value, "correct");
                 target = target.replace(tempRow[i].value, "_");
                 tempRow[i].value = "+";
-                tempInputs[curRow][i].status = "correct";
+                tempLevels[curLevel][curRow][i].status = "correct";
                 matchCount += 1;
             }
         }
         // check exists
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < WORDLE_CONSTANTS.MAX_COL; i++) {
             if (target.includes(tempRow[i].value)) {
-                tempKeyboard = setKeyStatus(tempKeyboard, tempInputs[curRow][i].value, "exist");
+                tempKeyboard = setKeyStatus(tempKeyboard, tempLevels[curLevel][curRow][i].value, "exist");
                 target = target.replace(tempRow[i].value, "_");
                 tempRow[i].value = "+";
-                tempInputs[curRow][i].status = "exist";
+                tempLevels[curLevel][curRow][i].status = "exist";
             } else {
-                if (tempInputs[curRow][i].status === "") {
-                    tempKeyboard = setKeyStatus(tempKeyboard, tempInputs[curRow][i].value, "incorrect");
-                    tempInputs[curRow][i].status = "incorrect";
+                if (tempLevels[curLevel][curRow][i].status === "") {
+                    tempKeyboard = setKeyStatus(tempKeyboard, tempLevels[curLevel][curRow][i].value, "incorrect");
+                    tempLevels[curLevel][curRow][i].status = "incorrect";
                 }
             }
-            tempInputs[curRow][i].animation = "flip";
+            tempLevels[curLevel][curRow][i].animation = "flip";
         }
 
         target = word;
-        setInputs(tempInputs);
+        setLevels(tempLevels);
         setKeyboard(tempKeyboard);
 
-        if (matchCount === 5) {
+        if (matchCount === WORDLE_CONSTANTS.MAX_COL) {
+
             await handleWin();
         }
-        else if (curRow >= 5) {
+        else if (curRow >= WORDLE_CONSTANTS.MAX_ROW - 1) {
             handleLoss();
         } else {
             setCurCol(0);
@@ -202,21 +228,36 @@ export function useWordle() {
     }
 
     const handleWin = async () => {
+        // calculate pause delay
+        const pDelay = WORDLE_CONSTANTS.WIN_ANIMATION_DELAY
+            + WORDLE_CONSTANTS.WIN_HIGHLIGHT_DELAY
+            + WORDLE_CONSTANTS.UPDATE_SCORE_DELAY
+            + WORDLE_CONSTANTS.FLIP_DELAY * (WORDLE_CONSTANTS.MAX_ROW - curRow);
+        setPauseDelay(pDelay);
         setGamePause(true);
-
+        await delay(WORDLE_CONSTANTS.WIN_ANIMATION_DELAY);
+        const tempLevels = levels;
+        for (let col = 0; col < WORDLE_CONSTANTS.MAX_COL; col++) {
+            tempLevels[curLevel][curRow][col].animation = "win";
+        }
+        setLevels(tempLevels);
+        await delay(WORDLE_CONSTANTS.WIN_HIGHLIGHT_DELAY);
         let tempScore = score;
-        tempScore += 1000;
+        tempScore += WORDLE_CONSTANTS.LEVEL_SCORE;
         // 1000 point for guessing the answer
         setScore(tempScore);
         // 100 point for each row left
-        for (let i = curRow; i < 5; i++) {
-            await delay(500);
-            tempScore += 100;
+        for (let i = curRow + 1; i < WORDLE_CONSTANTS.MAX_ROW; i++) {
+            for (let col = 0; col < WORDLE_CONSTANTS.MAX_COL; col++) {
+                tempLevels[curLevel][i][col].animation = "open";
+                tempLevels[curLevel][i][col].status = "clear";
+            }
+            await delay(WORDLE_CONSTANTS.FLIP_DELAY);
+            tempScore += WORDLE_CONSTANTS.ROW_REMAINING_SCORE;
+            setLevels(tempLevels);
             setScore(tempScore);
         }
-        delay(100);
-        setMessage("You Win!");
-        setDropdown(true);
+        delay(WORDLE_CONSTANTS.UPDATE_SCORE_DELAY);
     }
 
     const handleLoss = () => {
@@ -225,18 +266,18 @@ export function useWordle() {
     }
 
     const shakeAnimationTrigger = () => {
-        const tempInputs = inputs;
-        for (let i = 0; i < 5; i++) {
-            tempInputs[curRow][i].animation = "error";
+        const tempLevels = levels;
+        for (let i = 0; i < WORDLE_CONSTANTS.MAX_COL; i++) {
+            tempLevels[curLevel][curRow][i].animation = "error";
         }
-        setInputs(tempInputs);
+        setLevels(tempLevels)
 
         setTimeout(() => {
-            for (let i = 0; i < 5; i++) {
-                tempInputs[curRow][i].animation = "";
+            for (let i = 0; i < WORDLE_CONSTANTS.MAX_COL; i++) {
+                tempLevels[curLevel][curRow][i].animation = "";
             }
-            setInputs(tempInputs);
-        }, 500);
+            setLevels(tempLevels);
+        }, WORDLE_CONSTANTS.ERROR_SHAKE_DURATION);
     }
 
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -244,27 +285,27 @@ export function useWordle() {
 
     const deleteInput = () => {
         if (curCol > 0) {
-            setInputs((prevInputs) => {
-                const newInputs = [...prevInputs];
-                newInputs[curRow][curCol - 1].value = "";
-                return newInputs;
+            setLevels((prevLevels) => {
+                const newLevels = [...prevLevels];
+                newLevels[curLevel][curRow][curCol - 1].value = "";
+                return newLevels;
             });
             setCurCol(curCol - 1);
         }
     };
 
     const addInput = (value: string) => {
-        if (curRow < 6 && curCol < 5) {
-            setInputs((prevInputs) => {
-                const newInputs = [...prevInputs];
-                newInputs[curRow][curCol].value = value;
-                return newInputs;
+        if (curRow < WORDLE_CONSTANTS.MAX_ROW && curCol < WORDLE_CONSTANTS.MAX_COL) {
+            setLevels((prevLevels) => {
+                const newLevels = [...prevLevels];
+                newLevels[curLevel][curRow][curCol].value = value;
+                return newLevels;
             });
             setCurCol(curCol + 1);
         }
     };
 
-    return { inputs, curLevel, levels, keyboard, message, dropdown, score, gamePuase, keyHandler, setDropdown, nextLevel };
+    return { curLevel, levels, keyboard, message, dropdown, score, pauseDelay, gamePuase, gameComplete, gameOver, guessCount, keyHandler, setDropdown, nextLevel, newGame };
 }
 
 
