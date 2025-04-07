@@ -9,3 +9,4 @@ export { default as Arrow } from './Arrow';
 export { default as Bar } from './Bar';
 export { default as Button } from './Button';
 export { default as Setting } from './Setting'; 
+export { default as SettingBtn } from './SettingIcon';

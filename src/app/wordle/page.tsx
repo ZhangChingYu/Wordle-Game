@@ -1,14 +1,27 @@
 'use client';
-import { StageIcon, WordleBoard, KeyBtn, AlertDropdown, PauseMask, GameComplete, Arrow } from "@/Components";
+import { StageIcon, WordleBoard, KeyBtn, AlertDropdown, PauseMask, GameComplete, Arrow, Setting, SettingBtn } from "@/Components";
 import { useWordle } from './useWordle';
+import { useState } from "react";
 
 export default function Wordle() {
     const { curLevel, levels, keyboard, message, dropdown, score, 
         pauseDelay, gamePuase, gameComplete, gameOver, guessCount, 
-        keyHandler, setDropdown, nextLevel, newGame } = useWordle();
+        keyHandler, setDropdown, nextLevel, newGame, startBGM, stopBGM } = useWordle();
+
+    const [openSetting, setOpenSetting] = useState(false);
+
+    const openSettingWindow = () => {
+        console.log("open setting window")
+        setOpenSetting(true);
+    }
+
+    const closeSettingWindow = () => {
+        setOpenSetting(false);
+    }
 
     return (
         <div className="bg-slate-800 h-screen w-full fixed flex justify-center items-center">
+            <SettingBtn openWindowHandler={openSettingWindow} playBGM={startBGM} stopBGM={stopBGM} />
             <AlertDropdown show={dropdown} message={message} clickHandler={setDropdown} />
             <div className="bg-slate-900 h-auto w-auto px-1 flex flex-col items-center">
                 <div className="w-full pt-[.5rem] flex justify-center items-center">
@@ -58,9 +71,7 @@ export default function Wordle() {
                 curLevel={curLevel}
                 startNewGame={newGame} 
                 message="WANNA TRY AGAIN? OR TO TRY OTHER GAMES MAYBE?"/>
-            {
-                //<Setting />
-            }
+            {openSetting?<Setting closeHandler={closeSettingWindow} />:<></>}
         </div>
     );
 }

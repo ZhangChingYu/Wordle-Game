@@ -42,6 +42,7 @@ export function useWordle() {
     const { playSE, stopSE } = useSoundEffectFix();
     const [audioList, setAudioList] = useState<string[]>([AUDIO_CONSTANTS.TYPING]);
 
+
     // setup initial data when page load
     useEffect(() => {
         newGame();
@@ -123,13 +124,13 @@ export function useWordle() {
             } else if (e.key === "-") {
                 setGameComplete(true);
             }
-            playSE(AUDIO_CONSTANTS.TYPING);
         };
         window.addEventListener('keydown', keyDownEvent);
         return () => window.removeEventListener('keydown', keyDownEvent);
     }, [keyboard, curRow, curCol, gamePuase, score, enterPressed, dropdown]);
 
     const keyHandler = function (value: string) {
+        playSE(AUDIO_CONSTANTS.TYPING);
         if (gamePuase) {
             return;
         }
@@ -317,7 +318,15 @@ export function useWordle() {
         }
     };
 
-    return { curLevel, levels, keyboard, message, dropdown, score, pauseDelay, gamePuase, gameComplete, gameOver, guessCount, keyHandler, setDropdown, nextLevel, newGame };
+    const startBGM = () => {
+        playSE(AUDIO_CONSTANTS.BGM_1, {loop:true, volume:0.2});
+    }
+
+    const stopBGM = () => {
+        stopSE(AUDIO_CONSTANTS.BGM_1);
+    }
+
+    return { curLevel, levels, keyboard, message, dropdown, score, pauseDelay, gamePuase, gameComplete, gameOver, guessCount, keyHandler, setDropdown, nextLevel, newGame, startBGM, stopBGM };
 }
 
 
