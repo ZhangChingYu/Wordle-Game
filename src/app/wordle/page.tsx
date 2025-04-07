@@ -14,7 +14,7 @@ export default function Wordle() {
                 <div className="w-full pt-[.5rem] flex justify-center items-center">
                     <p className="text-[30px] font-bold text-green-500 tracking-widest">{`${score===0?"0000":score}`}</p>
                 </div>
-                <div className="flex flex-row justify-center items-center py-[.5rem]">
+                <div className="flex flex-row justify-center items-center pt-[.5rem]">
                     {[...Array(4)].map((_, id)=>(
                         <div key={id} className="flex flex-row items-center">
                             <StageIcon image={id===curLevel?"/StageHighlightIcon.png":"/StageIcon.png"} />

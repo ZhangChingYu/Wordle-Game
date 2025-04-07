@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { fetchRandomWord, fetchValidWordList } from "./wordleService";
+import { useSoundEffectFix } from "@/hooks/useSoundEffectFix";
 import constants from "@/Constants/wordleConstants.json";
 import WORDLE_CONSTANTS from "@/Constants/wordleContants";
+import AUDIO_CONSTANTS from "@/Constants/audioConstants";
 
 interface InputData {
     value: string,
@@ -36,11 +38,20 @@ export function useWordle() {
     const [guessCount, setGuessCount] = useState<number>(0);
     const [curLevel, setCurLevel] = useState<number>(0);
     const [pauseDelay, setPauseDelay] = useState<number>(5800);
-    
+
+    const { playSE, stopSE } = useSoundEffectFix();
+    const [audioList, setAudioList] = useState<string[]>([AUDIO_CONSTANTS.TYPING]);
 
     // setup initial data when page load
     useEffect(() => {
         newGame();
+        // turn off all playing audio when leave the game
+        return () => {
+            for(let i = 0 ; i < audioList.length ; i ++) {
+                stopSE(audioList[i]);
+            }
+            setAudioList([]);
+        }
     }, []);
 
     // reset game data
@@ -112,6 +123,7 @@ export function useWordle() {
             } else if (e.key === "-") {
                 setGameComplete(true);
             }
+            playSE(AUDIO_CONSTANTS.TYPING);
         };
         window.addEventListener('keydown', keyDownEvent);
         return () => window.removeEventListener('keydown', keyDownEvent);
