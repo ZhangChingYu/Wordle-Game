@@ -130,6 +130,7 @@ export function useWordle() {
     }, [keyboard, curRow, curCol, gamePuase, score, enterPressed, dropdown]);
 
     const keyHandler = function (value: string) {
+        // play typing sound effect
         playSE(AUDIO_CONSTANTS.TYPING);
         if (gamePuase) {
             return;
